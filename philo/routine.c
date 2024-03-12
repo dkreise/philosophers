@@ -1,64 +1,106 @@
 #include "philosophers.h"
 
+void print_state(t_philo *philo, char *state)
+{
+    int end;
+
+    pthread_mutex_lock(&(philo->data->end_mutex));
+    end = philo->data->end_flg;
+    pthread_mutex_unlock(&(philo->data->end_mutex));
+    pthread_mutex_lock(&(philo->data->print_mutex));
+    if (end == 0)
+        printf("%i %i %s\n", cur_time_ms(), philo->id, state); // add timestamp
+    pthread_mutex_unlock(&(philo->data->print_mutex));
+}
+
 void eat(t_philo *philo)
 {
     pthread_mutex_lock(philo->left_fork);
-    printf("%i has taken a left fork\n", philo->id);
+    print_state(philo, "has taken left fork");
     pthread_mutex_lock(philo->right_fork);
-    printf("%i has taken a right fork\n", philo->id);
-    printf("%i is eating\n", philo->id);
+    print_state(philo, "has taken right fork");
+    print_state(philo, "is eating");
     ft_usleep(philo->eat_time);
+    pthread_mutex_lock(&(philo->death_mutex));
     philo->time_of_death = cur_time_ms() + philo->death_time;
+    pthread_mutex_unlock(&(philo->death_mutex));
     philo->cnt_eaten = philo->cnt_eaten + 1;
+    if (philo->eat_cnt >= 0  && philo->cnt_eaten == philo->eat_cnt)
+    {
+        pthread_mutex_lock(&(philo->data->full_mutex));
+        philo->data->full_philos = philo->data->full_philos + 1;
+        pthread_mutex_unlock(&(philo->data->full_mutex));
+    }
     pthread_mutex_unlock(philo->left_fork);
-    printf("%i has unlocked a left fork\n", philo->id);
+    //printf("%i has unlocked a left fork\n", philo->id);
     pthread_mutex_unlock(philo->right_fork);
-    printf("%i has unlocked a right fork\n", philo->id);
+    //printf("%i has unlocked a right fork\n", philo->id);
 }
 
 // eat, sleep, think
 void *routine(void *arg_philo)
 {
     t_philo *philo;
+    int end;
 
     philo = (t_philo *) arg_philo;
+    end = 0;
     printf("--- in thread of philo %i ---\n", philo->id);
+    pthread_mutex_lock(&(philo->death_mutex));
     philo->time_of_death = cur_time_ms() + philo->death_time;
-    // while dead_flg == 0 ??
-    while (philo->cnt_eaten < philo->eat_cnt)
+    pthread_mutex_unlock(&(philo->death_mutex));
+    if (philo->id % 2 == 1)
     {
-        if (philo->id % 2 == 1)
-            ft_usleep(100);
-        eat(philo);
-        printf("%i is sleeping\n", philo->id);
-        ft_usleep(philo->sleep_time);
-        printf("%i is thinking\n", philo->id);
+        ft_usleep(philo->eat_time / 2);
+        //usleep(20000);
     }
-    return (NULL); // how to avoid it or not
+    while (end == 0)
+    {
+        eat(philo);
+        print_state(philo, "is sleeping");
+        ft_usleep(philo->sleep_time);
+        print_state(philo, "is thinking");
+        pthread_mutex_lock(&(philo->data->end_mutex));
+        end = philo->data->end_flg;
+        pthread_mutex_unlock(&(philo->data->end_mutex));
+    }
+    return (NULL);
 }
 
 void monitor(t_data *data)
 {
     int i;
+    int death_time;
+    int full;
 
     i = 0;
-    while (i < data->philo_cnt)
+    while (1)
     {
-        if (data->philos[i].time_of_death > 0 && cur_time_ms() > data->philos[i].time_of_death)
+        if (i == data->philo_cnt)
+            i = 0;
+        pthread_mutex_lock(&(data->philos[i].death_mutex));
+        death_time = data->philos[i].time_of_death;
+        pthread_mutex_unlock(&(data->philos[i].death_mutex));
+        if (death_time > 0 && cur_time_ms() > death_time)
         {
-            printf("%i is dead\n", data->philos[i].id);
+            print_state(&(data->philos[i]), "died");
+            printf("SOMEONE IS DEAD!!\n");
+            pthread_mutex_lock(&(data->end_mutex));
             data->end_flg = 1;
+            pthread_mutex_unlock(&(data->end_mutex));
             break ;
         }
-        if (data->eat_cnt >= 0  && data->philos[i].cnt_eaten == data->eat_cnt)
-            data->full_philos = data->full_philos + 1;
-        if (data->eat_cnt >= 0 && data->full_philos == data->philo_cnt)
+        pthread_mutex_lock(&(data->full_mutex));
+        full = data->full_philos;
+        pthread_mutex_unlock(&(data->full_mutex));
+        if (data->eat_cnt >= 0 && full == data->philo_cnt)
         {
+            pthread_mutex_lock(&(data->end_mutex));
             data->end_flg = 1;
+            pthread_mutex_unlock(&(data->end_mutex));
+            printf("PHILOS ARE FULL!!\n");
             break;
         }
         i ++;
-        if (i == data->philo_cnt)
-            i = 0;
     }
 }

@@ -21,8 +21,12 @@ void destroy_mutex(t_data *data)
     while (i < data->philo_cnt)
     {
         pthread_mutex_destroy(&(data->forks[i]));
+        pthread_mutex_destroy(&(data->philos[i].death_mutex));
         i ++;
     }
+    pthread_mutex_destroy(&(data->full_mutex));
+    pthread_mutex_destroy(&(data->print_mutex));
+    pthread_mutex_destroy(&(data->end_mutex));
 }
 
 int main(int argc, char **argv)
@@ -39,6 +43,7 @@ int main(int argc, char **argv)
     init_data(&data, argc, argv);
     //printf("philo cnt: %i\n", data.philo_cnt);
     //printf("id and meals eaten: %i, %i\n", data.philos[1].id, data.philos[1].cnt_eaten);
+    monitor(&data);
     join_threads(&data);
     destroy_mutex(&data);
     return (0);

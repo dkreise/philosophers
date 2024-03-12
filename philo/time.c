@@ -17,7 +17,8 @@ int ft_usleep(int ms)
 
     end_time = cur_time_ms() + ms;
     while (cur_time_ms() < end_time)
+    {
         usleep(200);
-        // protect usleep
+    }
     return (0);
 }

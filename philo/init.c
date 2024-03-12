@@ -33,12 +33,13 @@ void init_philos(t_data *data)
             data->philos[i].right_fork = &(data->forks[data->philo_cnt - 1]);
         else
             data->philos[i].right_fork = &(data->forks[i - 1]);
+        pthread_mutex_init(&(data->philos[i].death_mutex), NULL);
         data->philos[i].data = data;
         i ++;
     }
 }
 
-void init_forks(t_data *data)
+void init_mutex(t_data *data)
 {
     int i;
 
@@ -48,6 +49,9 @@ void init_forks(t_data *data)
         pthread_mutex_init(&(data->forks[i]), NULL);
         i ++;
     }
+    pthread_mutex_init(&(data->print_mutex), NULL);
+    pthread_mutex_init(&(data->full_mutex), NULL);
+    pthread_mutex_init(&(data->end_mutex), NULL);
 }
 
 void init_data(t_data *data, int argc, char **argv)
@@ -66,7 +70,7 @@ void init_data(t_data *data, int argc, char **argv)
     data->philos = malloc(data->philo_cnt * sizeof(t_philo));
     data->threads = malloc(data->philo_cnt * sizeof(pthread_t));
     // malloc protection
-    init_forks(data);
+    init_mutex(data);
     init_philos(data);
     init_threads(data);
 }
