@@ -72,5 +72,6 @@ void init_data(t_data *data, int argc, char **argv)
     // malloc protection
     init_mutex(data);
     init_philos(data);
+    data->start_time = cur_time_ms();
     init_threads(data);
 }

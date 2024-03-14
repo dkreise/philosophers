@@ -41,8 +41,6 @@ int main(int argc, char **argv)
     }
     // check that args are numbers
     init_data(&data, argc, argv);
-    //printf("philo cnt: %i\n", data.philo_cnt);
-    //printf("id and meals eaten: %i, %i\n", data.philos[1].id, data.philos[1].cnt_eaten);
     monitor(&data);
     join_threads(&data);
     destroy_mutex(&data);
