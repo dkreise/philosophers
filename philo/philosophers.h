@@ -33,6 +33,7 @@ typedef struct s_data
     int eat_cnt;
     int end_flg;
     int full_philos;
+    int start_time;
     pthread_mutex_t *forks;
     struct s_philo *philos;
     pthread_t *threads;

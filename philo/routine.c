@@ -9,8 +9,20 @@ void print_state(t_philo *philo, char *state)
     pthread_mutex_unlock(&(philo->data->end_mutex));
     pthread_mutex_lock(&(philo->data->print_mutex));
     if (end == 0)
-        printf("%i %i %s\n", cur_time_ms(), philo->id, state); // add timestamp
+        printf("%i %i %s\n", cur_time_ms(), philo->id, state);
     pthread_mutex_unlock(&(philo->data->print_mutex));
+}
+
+int one_philo(t_philo *philo)
+{
+    if (philo->data->philo_cnt == 1)
+    {
+        pthread_mutex_lock(philo->left_fork);
+        print_state(philo, "has taken left fork");
+        pthread_mutex_unlock(philo->left_fork);
+        return (1);
+    }
+    return (0);
 }
 
 void eat(t_philo *philo)
@@ -20,10 +32,10 @@ void eat(t_philo *philo)
     pthread_mutex_lock(philo->right_fork);
     print_state(philo, "has taken right fork");
     print_state(philo, "is eating");
-    ft_usleep(philo->eat_time);
     pthread_mutex_lock(&(philo->death_mutex));
     philo->time_of_death = cur_time_ms() + philo->death_time;
     pthread_mutex_unlock(&(philo->death_mutex));
+    ft_usleep(philo->eat_time);
     philo->cnt_eaten = philo->cnt_eaten + 1;
     if (philo->eat_cnt >= 0  && philo->cnt_eaten == philo->eat_cnt)
     {
@@ -49,6 +61,8 @@ void *routine(void *arg_philo)
     pthread_mutex_lock(&(philo->death_mutex));
     philo->time_of_death = cur_time_ms() + philo->death_time;
     pthread_mutex_unlock(&(philo->death_mutex));
+    if (one_philo(philo))
+        return (NULL);
     if (philo->id % 2 == 1)
     {
         ft_usleep(philo->eat_time / 2);
@@ -83,11 +97,14 @@ void monitor(t_data *data)
         pthread_mutex_unlock(&(data->philos[i].death_mutex));
         if (death_time > 0 && cur_time_ms() > death_time)
         {
-            print_state(&(data->philos[i]), "died");
-            printf("SOMEONE IS DEAD!!\n");
+            //print_state(&(data->philos[i]), "died");
             pthread_mutex_lock(&(data->end_mutex));
             data->end_flg = 1;
             pthread_mutex_unlock(&(data->end_mutex));
+            pthread_mutex_lock(&(data->print_mutex));
+            printf("%i %i died\n", cur_time_ms(), data->philos[i].id);
+            printf("SOMEONE IS DEAD!!\n");
+            pthread_mutex_unlock(&(data->print_mutex));
             break ;
         }
         pthread_mutex_lock(&(data->full_mutex));
@@ -98,7 +115,9 @@ void monitor(t_data *data)
             pthread_mutex_lock(&(data->end_mutex));
             data->end_flg = 1;
             pthread_mutex_unlock(&(data->end_mutex));
+            pthread_mutex_lock(&(data->print_mutex));
             printf("PHILOS ARE FULL!!\n");
+            pthread_mutex_unlock(&(data->print_mutex));
             break;
         }
         i ++;
