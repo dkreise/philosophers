@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dkreise <dkreise@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/15 14:07:03 by dkreise           #+#    #+#             */
+/*   Updated: 2024/03/15 14:07:56 by dkreise          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILOSOPHERS_H
 #define PHILOSOPHERS_H
 
@@ -5,8 +17,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <limits.h>
 #include <sys/time.h>
-// libft
 
 typedef struct s_philo
 {
@@ -42,10 +54,12 @@ typedef struct s_data
     pthread_mutex_t full_mutex;
 } t_data;
 
+int invalid_args(int argc, char **argv);
 void init_data(t_data *data, int argc, char **argv);
 void *routine(void *arg_philo);
 void monitor(t_data *data);
 int cur_time_ms(void);
 int ft_usleep(int ms);
+void print_state(t_philo *philo, char *state);
 
 #endif

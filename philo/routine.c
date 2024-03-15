@@ -1,17 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routine.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dkreise <dkreise@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/15 14:06:36 by dkreise           #+#    #+#             */
+/*   Updated: 2024/03/15 15:19:19 by dkreise          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
-
-void print_state(t_philo *philo, char *state)
-{
-    int end;
-
-    pthread_mutex_lock(&(philo->data->end_mutex));
-    end = philo->data->end_flg;
-    pthread_mutex_unlock(&(philo->data->end_mutex));
-    pthread_mutex_lock(&(philo->data->print_mutex));
-    if (end == 0)
-        printf("%i %i %s\n", cur_time_ms() - philo->data->start_time, philo->id, state);
-    pthread_mutex_unlock(&(philo->data->print_mutex));
-}
 
 int one_philo(t_philo *philo)
 {
@@ -92,12 +91,13 @@ void monitor(t_data *data)
         if (death_time > 0 && cur_time_ms() > death_time)
         {
             pthread_mutex_lock(&(data->end_mutex));
-            data->end_flg = 1;
-            pthread_mutex_unlock(&(data->end_mutex));
+            //pthread_mutex_unlock(&(data->end_mutex));
             pthread_mutex_lock(&(data->print_mutex));
+            data->end_flg = 1;
             printf("%i %i died\n", cur_time_ms() - data->start_time, data->philos[i].id);
-            printf("SOMEONE IS DEAD!!\n");
+            //printf("SOMEONE IS DEAD!!\n");
             pthread_mutex_unlock(&(data->print_mutex));
+            pthread_mutex_unlock(&(data->end_mutex));
             break ;
         }
         pthread_mutex_lock(&(data->full_mutex));
@@ -107,10 +107,10 @@ void monitor(t_data *data)
         {
             pthread_mutex_lock(&(data->end_mutex));
             data->end_flg = 1;
-            pthread_mutex_unlock(&(data->end_mutex));
             pthread_mutex_lock(&(data->print_mutex));
             printf("PHILOS ARE FULL!!\n");
             pthread_mutex_unlock(&(data->print_mutex));
+            pthread_mutex_unlock(&(data->end_mutex));
             break;
         }
         i ++;
