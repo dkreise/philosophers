@@ -6,7 +6,7 @@
 /*   By: dkreise <dkreise@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 14:06:36 by dkreise           #+#    #+#             */
-/*   Updated: 2024/03/15 16:35:02 by dkreise          ###   ########.fr       */
+/*   Updated: 2024/03/15 17:14:50 by dkreise          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ void	monitor(t_data *data)
 {
 	int	i;
 	int	death_time;
-	int	full;
 
 	i = 0;
 	while (1)
@@ -92,8 +91,8 @@ void	monitor(t_data *data)
 			print_end(data, DIED, i);
 			break ;
 		}
-		full = get_full(data);
-		if (data->eat_cnt >= 0 && full == data->philo_cnt)
+		if ((data->eat_cnt >= 0 && full_philos(data) == data->philo_cnt)
+			|| data->eat_cnt == 0)
 		{
 			print_end(data, FULL, i);
 			break ;

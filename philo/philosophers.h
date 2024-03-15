@@ -6,7 +6,7 @@
 /*   By: dkreise <dkreise@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 14:07:03 by dkreise           #+#    #+#             */
-/*   Updated: 2024/03/15 16:35:09 by dkreise          ###   ########.fr       */
+/*   Updated: 2024/03/15 17:15:08 by dkreise          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int		cur_time_ms(void);
 int		ft_usleep(int ms);
 void	print_state(t_philo *philo, char *state);
 void	print_end(t_data *data, int end, int i);
-int		get_full(t_data *data);
+int		full_philos(t_data *data);
 int		ft_atoi(char *nptr);
 
 #endif

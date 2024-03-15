@@ -6,7 +6,7 @@
 /*   By: dkreise <dkreise@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 14:06:46 by dkreise           #+#    #+#             */
-/*   Updated: 2024/03/15 16:34:47 by dkreise          ###   ########.fr       */
+/*   Updated: 2024/03/15 17:14:59 by dkreise          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	print_end(t_data *data, int end, int i)
 	pthread_mutex_unlock(&(data->end_mutex));
 }
 
-int	get_full(t_data *data)
+int	full_philos(t_data *data)
 {
 	int	full;
 
