@@ -3,7 +3,7 @@ NAME = philo
 #########
 RM = rm -f
 CC = cc
-CFLAGS = -Werror -Wextra -Wall #-g -fsanitize=thread
+CFLAGS = -Werror -Wextra -Wall #-g -fsanitize=address
 #########
 
 #########
@@ -25,7 +25,6 @@ $(OBJ_DIR)/%.o: %.c
 	${CC} $(CFLAGS) -Ilibft -MMD -c $< -o $@
 
 all:
-	#@$(MAKE) -C $(LIBFT_DIR) --no-print-directory
 	$(MAKE) $(NAME) --no-print-directory
 
 $(NAME): $(OBJ)
@@ -33,7 +32,6 @@ $(NAME): $(OBJ)
 	@echo "EVERYTHING DONE  "
 
 clean:
-	#$(MAKE) clean -C $(LIBFT_DIR)
 	$(RM) $(OBJ) $(DEP) --no-print-directory
 	$(RM) -r $(OBJ_DIR) --no-print-directory
 	@echo "OBJECTS REMOVED   "
