@@ -22,7 +22,7 @@ DEP = $(addsuffix .d, $(basename $(OBJ)))
 #########
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
-	${CC} $(CFLAGS) -Ilibft -MMD -c $< -o $@
+	${CC} $(CFLAGS) -MMD -c $< -o $@
 
 all:
 	$(MAKE) $(NAME) --no-print-directory
@@ -37,7 +37,6 @@ clean:
 	@echo "OBJECTS REMOVED   "
 
 fclean: clean
-	#$(MAKE) fclean -C $(LIBFT_DIR)
 	$(RM) $(NAME) --no-print-directory
 	@echo "EVERYTHING REMOVED   "
 
